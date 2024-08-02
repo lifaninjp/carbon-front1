@@ -1,4 +1,4 @@
-import { YEARS_SELECT } from "@/constants";
+import { CAT_INDEX, YEARS_SELECT } from "@/constants";
 import { ModalForm, ProForm, ProFormGroup, ProFormSelect, ProFormText, ProList } from "@ant-design/pro-components";
 import { useRequest } from "ahooks";
 import industryAttributeInfosServices from '@/services/industry-attribute-infos';
@@ -69,7 +69,7 @@ const Co2TemplatePage: React.FC = () => {
     title: item.title,
     subTitle: <Space><Tag color="#5BD8A6">{item.scope_cls}</Tag><Tag hidden={!item.category_nm}>{item.category_nm}</Tag></Space>,
     actions: [
-      <Link to='manage' state={{ industryScopeInfo: item }}>編集</Link>,
+      <Link to={`manage/cat${Number(item.scope_cls?.slice(-1)) < 3 ? ['0', '10', '11'][Number(item.scope_cls?.slice(-1))] : CAT_INDEX[Number(item.category_cls?.slice(-2))]}`} state={{ industryScopeInfo: item }}>編集</Link>,
       <DeleteScopeInfoModal _id={item._id} industryScopeInfosRes={industryScopeInfosRes} />
     ],
     avatar: 'https://gw.alipayobjects.com/zos/antfincdn/UCSiy1j6jx/xingzhuang.svg',
@@ -148,7 +148,7 @@ const Co2TemplatePage: React.FC = () => {
         </ProFormGroup>
         <ProList<any>
           ghost
-          grid={{ gutter: 10, column: 3 }}
+          grid={{ gutter: 10, column: 2 }}
           metas={{
             title: {},
             subTitle: {},

@@ -25,12 +25,10 @@ type TableListItem = {
   company_id: string,
   organization_id: string,
   industry_info_id: string,
-  counterparty_nm: string,
-  item_nm: string,
   kind_cd: string,
   kind_type_nm: string,
   activity_unit: string,
-  activity_amount: number,
+  activity_energy: number,
   emission_factor: number,
   emission_factor_unit: string,
   ghg_emission: number,
@@ -105,17 +103,9 @@ const Co2ManagePage: React.FC = () => {
       dataIndex: 'organization_nm',
     },
     {
-      title: '相手先',
-      dataIndex: 'counterparty_nm',
-    },
-    {
       title: '種類',
       dataIndex: 'kind_type_nm',
       search: false
-    },
-    {
-      title: '項目名',
-      dataIndex: 'item_nm',
     },
     {
       title: '活動量単位',
@@ -123,8 +113,8 @@ const Co2ManagePage: React.FC = () => {
       search: false
     },
     {
-      title: '活動量（金額）【百万円】',
-      dataIndex: 'activity_amount',
+      title: '活動量（エネルギー）',
+      dataIndex: 'activity_energy',
       search: false
     },
     {
@@ -214,26 +204,23 @@ const CreatModal: React.FC<{
     const [form] = Form.useForm<{
       monthly: string;
       organization_id: string;
-      counterparty_nm: string;
-      item_nm: string;
       kind_cd: string;
       kind_type_nm: string;
       emission_factor: number;
-      activity_amount: number;
+      activity_energy: number;
       activity_unit: string;
       emission_factor_unit: string;
     }>();
+    const factorUnit = Form.useWatch('emission_factor_unit', form);
     const { industry_info_id, company_id, fiscal_y, scope_cls, category_cls, category_nm } = industryScopeInfo;
     return (
       <ModalForm<{
         monthly: string;
         organization_id: string;
-        counterparty_nm: string;
-        item_nm: string;
         kind_cd: string;
         kind_type_nm: string;
         emission_factor: number;
-        activity_amount: number;
+        activity_energy: number;
         activity_unit: string;
         emission_factor_unit: string;
       }>
@@ -258,7 +245,7 @@ const CreatModal: React.FC<{
         submitTimeout={1000}
         onFinish={async (values) => {
           const emissionFactor = new Decimal(values.emission_factor);
-          const activityAmount = new Decimal(values.activity_amount)
+          const activityAmount = new Decimal(values.activity_energy)
           const createRes = await createIndustryAttributeInfoDetail({
             create_prg_id: adminInfo?.manager_id,
             industry_info_id,
@@ -295,20 +282,6 @@ const CreatModal: React.FC<{
             options={organizationMstsData?.map(i => ({ label: `${i.instituition} - ${i.organization_nm}`, value: i.organization_id }))}
             rules={[{ required: true, message: '必須' }]}
           />
-          <ProFormText
-            width="xl"
-            name="counterparty_nm"
-            label="相手先"
-            placeholder="製品・サービスの購入先"
-            rules={[{ required: true, message: '必須' }]}
-          />
-          <ProFormText
-            width="xl"
-            name="item_nm"
-            label="項目名"
-            placeholder="購入した製品名・サービス名"
-            rules={[{ required: true, message: '必須' }]}
-          />
           <ProFormSelect
             width="xl"
             name="kind_cd"
@@ -317,11 +290,11 @@ const CreatModal: React.FC<{
             options={scopeData?.type_lists?.map(i => ({ label: i.name, value: i.id }))}
             onChange={(value: any) => {
               const typeItem = scopeData?.type_lists?.find(i => i.id === value);
-              form.setFieldsValue({ kind_type_nm: typeItem?.name, emission_factor: typeItem?.emission_value })
+              form.setFieldsValue({ kind_type_nm: typeItem?.name, emission_factor: typeItem?.emission_value, activity_unit: typeItem?.unit.split('/')[1], emission_factor_unit: `t-CO2e/${typeItem?.unit.split('/')[1]}` })
             }}
             rules={[{ required: true, message: '必須' }]}
             showSearch
-            extra="t-CO2e/百万円 に基づいて計算してください"
+            extra={`${factorUnit} に基づいて計算してください`}
           />
           <ProFormText
             width="xl"
@@ -333,15 +306,15 @@ const CreatModal: React.FC<{
           />
           <ProFormText
             width="xl"
-            name="activity_amount"
-            label="活動量（金額）【百万円】"
-            placeholder="製品・サービスの経費【百万円】"
+            name="activity_energy"
+            label="活動量（エネルギー）"
+            placeholder="エネルギー使用量"
             rules={[{ required: true, message: '必須' }]}
           />
         </ProForm.Group>
         <ProFormItem name="kind_type_nm" />
-        <ProFormItem name="activity_unit" initialValue="百万円" />
-        <ProFormItem name="emission_factor_unit" initialValue="tCO2/百万円" />
+        <ProFormItem name="activity_unit" initialValue="kWh" />
+        <ProFormItem name="emission_factor_unit" initialValue="t-CO2e/kWh" />
 
       </ModalForm>
     );
@@ -358,26 +331,23 @@ const UpdateModal: React.FC<{
     const [form] = Form.useForm<{
       monthly: string;
       organization_id: string;
-      counterparty_nm: string;
-      item_nm: string;
       kind_cd: string;
       kind_type_nm: string;
       emission_factor: number;
-      activity_amount: number;
+      activity_energy: number;
       activity_unit: string;
       emission_factor_unit: string;
     }>();
-    const { _id, fiscal_y, monthly, organization_id, counterparty_nm, item_nm, kind_cd, emission_factor, activity_amount } = itemData;
+    const factorUnit = Form.useWatch('emission_factor_unit', form);
+    const { _id, fiscal_y, monthly, organization_id, kind_cd, emission_factor, activity_energy } = itemData;
     return (
       <ModalForm<{
         monthly: string;
         organization_id: string;
-        counterparty_nm: string;
-        item_nm: string;
         kind_cd: string;
         kind_type_nm: string;
         emission_factor: number;
-        activity_amount: number;
+        activity_energy: number;
         activity_unit: string;
         emission_factor_unit: string;
       }>
@@ -396,7 +366,7 @@ const UpdateModal: React.FC<{
         submitTimeout={1000}
         onFinish={async (values) => {
           const emissionFactor = new Decimal(values.emission_factor);
-          const activityAmount = new Decimal(values.activity_amount)
+          const activityAmount = new Decimal(values.activity_energy)
           const updateRes = await updateIndustryAttributeInfoDetail({ _id }, {
             create_prg_id: adminInfo?.manager_id,
             ghg_emission: emissionFactor.times(activityAmount).toNumber(),
@@ -428,22 +398,6 @@ const UpdateModal: React.FC<{
             initialValue={organization_id}
 
           />
-          <ProFormText
-            width="xl"
-            name="counterparty_nm"
-            label="相手先"
-            placeholder="製品・サービスの購入先"
-            rules={[{ required: true, message: '必須' }]}
-            initialValue={counterparty_nm}
-          />
-          <ProFormText
-            width="xl"
-            name="item_nm"
-            label="項目名"
-            placeholder="購入した製品名・サービス名"
-            rules={[{ required: true, message: '必須' }]}
-            initialValue={item_nm}
-          />
           <ProFormSelect
             width="xl"
             name="kind_cd"
@@ -452,12 +406,12 @@ const UpdateModal: React.FC<{
             options={scopeData?.type_lists?.map(i => ({ label: i.name, value: i.id }))}
             onChange={(value: any) => {
               const typeItem = scopeData?.type_lists?.find(i => i.id === value);
-              form.setFieldsValue({ kind_type_nm: typeItem?.name, emission_factor: typeItem?.emission_value })
+              form.setFieldsValue({ kind_type_nm: typeItem?.name, emission_factor: typeItem?.emission_value, activity_unit: typeItem?.unit.split('/')[1], emission_factor_unit: `t-CO2e/${typeItem?.unit.split('/')[1]}` })
             }}
             rules={[{ required: true, message: '必須' }]}
             initialValue={kind_cd}
             showSearch
-            extra="t-CO2e/百万円 に基づいて計算してください"
+            extra={`${factorUnit} に基づいて計算してください`}
           />
           <ProFormText
             width="xl"
@@ -470,16 +424,16 @@ const UpdateModal: React.FC<{
           />
           <ProFormText
             width="xl"
-            name="activity_amount"
-            label="活動量（金額）【百万円】"
-            placeholder="製品・サービスの経費【百万円】"
+            name="activity_energy"
+            label="活動量（エネルギー）"
+            placeholder="エネルギー使用量"
             rules={[{ required: true, message: '必須' }]}
-            initialValue={activity_amount}
+            initialValue={activity_energy}
           />
         </ProForm.Group>
         <ProFormItem name="kind_type_nm" />
-        <ProFormItem name="activity_unit" initialValue="百万円" />
-        <ProFormItem name="emission_factor_unit" initialValue="tCO2/百万円" />
+        <ProFormItem name="activity_unit" initialValue="kWh" />
+        <ProFormItem name="emission_factor_unit" initialValue="t-CO2e/kWh" />
 
       </ModalForm>
     );
@@ -546,23 +500,19 @@ const ExcelUpload: React.FC<{ adminInfo: any, industryScopeInfo: any, organizati
         if (!organization_id) {
           currentError["事業/事業所"] = "△";
         }
-        const counterparty_nm = String(line["相手先"]);
-        if (!counterparty_nm) currentError["相手先"] = "△";
-        const item_nm = String(line["項目名"]);
-        if (!item_nm) currentError["項目名"] = "△";
         const kind_type_nm = line["種類"];
         const currentScopeData = scopeData?.type_lists?.find(item => item.name === kind_type_nm);
         if (!currentScopeData) currentError["種類"] = "△";
-        const activity_amount = Number(line["活動量（金額）【百万円】"]) || 0;
-        if (activity_amount === 0) {
-          currentError["活動量（金額）【百万円】"] = "△";
+        const activity_energy = Number(line["活動量（エネルギー）"]) || 0;
+        if (activity_energy === 0) {
+          currentError["活動量（エネルギー）"] = "△";
         }
 
         if (Object.keys(currentError).length === 1) {
           const kind_cd = currentScopeData?.id;
           const emission_factor = currentScopeData?.emission_value as number;
           const emissionFactor = new Decimal(emission_factor);
-          const activityAmount = new Decimal(activity_amount)
+          const activityAmount = new Decimal(activity_energy)
           payload.push({
             create_prg_id: adminInfo?.manager_id,
             industry_info_id,
@@ -573,14 +523,12 @@ const ExcelUpload: React.FC<{ adminInfo: any, industryScopeInfo: any, organizati
             category_nm,
             monthly: MONTH_SELECT[monthly - 1],
             organization_id,
-            counterparty_nm,
-            item_nm,
             kind_cd,
             kind_type_nm,
             emission_factor,
-            activity_amount,
-            activity_unit: "百万円",
-            emission_factor_unit: "tCO2/百万円",
+            activity_energy,
+            activity_unit: currentScopeData?.unit?.split('/')[1],
+            emission_factor_unit: `t-CO2e/${currentScopeData?.unit?.split('/')[1]}`,
             ghg_emission: emissionFactor.times(activityAmount).toNumber(),
           })
         } else {
@@ -588,7 +536,7 @@ const ExcelUpload: React.FC<{ adminInfo: any, industryScopeInfo: any, organizati
         }
       }
       if (errorList.length > 0) {
-        const header = ["行番号", "月", "事業/事業所", "相手先", "項目名", "種類", "活動量（金額）【百万円】"];
+        const header = ["行番号", "月", "事業/事業所", "種類", "活動量（エネルギー）"];
         const wscols = header.map(i => ({ width: 25 }));
         const worksheet = utils.json_to_sheet(errorList, { header });
         worksheet["!cols"] = wscols;
@@ -597,7 +545,6 @@ const ExcelUpload: React.FC<{ adminInfo: any, industryScopeInfo: any, organizati
         writeFile(workbook, "エラー詳細.xlsx");
       } else {
         const data = await importIndustryAttributeInfoDetails({ importArray: payload });
-        console.log(data);
         industryAttributeInfoDetailsRes.refresh();
       }
     }
@@ -647,7 +594,7 @@ const ExcelDownload: React.FC<{ dataSource: any, columns: ProColumns<TableListIt
 }
 
 const TemplateDownload: React.FC<any> = () => {
-  const header = ["月", "事業", "事業所", "相手先", "項目名", "種類", "活動量（金額）【百万円】"];
+  const header = ["月", "事業", "事業所", "種類", "活動量（エネルギー）"];
   const wscols = header.map(i => ({ width: 25 }));
   const handleDownloadClick = () => {
     const worksheet = utils.json_to_sheet([], { header });
@@ -676,8 +623,6 @@ const FilterModal: React.FC<{
       monthly_gte: string;
       monthly_lte: string;
       organization_id: string;
-      counterparty_nm: string;
-      item_nm: string;
       kind_cd: string;
       kind_type_nm: string;
     }>();
@@ -687,8 +632,6 @@ const FilterModal: React.FC<{
         monthly_gte: string;
         monthly_lte: string;
         organization_id: string;
-        counterparty_nm: string;
-        item_nm: string;
         kind_cd: string;
         kind_type_nm: string;
       }>
@@ -750,18 +693,6 @@ const FilterModal: React.FC<{
             label="事業 - 事業所"
             placeholder="事業 - 事業所"
             options={organizationMstsData?.map(i => ({ label: `${i.instituition} - ${i.organization_nm}`, value: i.organization_id }))}
-          />
-          <ProFormText
-            width="xl"
-            name="counterparty_nm"
-            label="相手先"
-            placeholder="製品・サービスの購入先"
-          />
-          <ProFormText
-            width="xl"
-            name="item_nm"
-            label="項目名"
-            placeholder="購入した製品名・サービス名"
           />
           <ProFormSelect
             width="xl"
