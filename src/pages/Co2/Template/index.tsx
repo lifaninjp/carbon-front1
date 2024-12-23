@@ -74,14 +74,14 @@ const Co2TemplatePage: React.FC = () => {
     ],
     avatar: 'https://gw.alipayobjects.com/zos/antfincdn/UCSiy1j6jx/xingzhuang.svg',
     content: (
-      <Space direction="vertical" style={{ marginTop: "-10px", marginBlockEnd: "-30px", minHeight: "300px" }}>
+      <Space direction="vertical" style={{ marginTop: "-10px", marginBlockEnd: "-30px", minHeight: "200px" }}>
         <Text style={{ fontSize: "12px" }}>想定関連部署： {item.department}</Text>
         <Text style={{ fontSize: "12px" }}>活動量データ： {item.active_data}</Text>
-        <img
+        {/* <img
           width={180}
           style={{ marginBlockStart: "20px" }}
           src="http://management.cc-dashboards.com/scopes/SCOPE3CAT01.svg"
-        />
+        /> */}
       </Space>
     ),
   }));
@@ -148,7 +148,7 @@ const Co2TemplatePage: React.FC = () => {
         </ProFormGroup>
         <ProList<any>
           ghost
-          grid={{ gutter: 10, column: 2 }}
+          grid={{ gutter: 10, column: 3 }}
           metas={{
             title: {},
             subTitle: {},

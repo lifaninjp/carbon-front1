@@ -1,0 +1,9 @@
+{
+    "apps" : [
+      {
+        "name"      : "carbon-front1-prod",
+        "script"    : "sudo yarn prod",
+        "interpreter": "none"
+      }
+    ]
+  }

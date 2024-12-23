@@ -28,6 +28,7 @@ export default defineConfig({
   access: {},
   model: {},
   initialState: {},
+  define: { 'process.env.API_URL': 'http://35.72.154.8:4000' },
   request: {},
   layout: {},
   routes: [
@@ -88,29 +89,85 @@ export default defineConfig({
       component: './Co2/Template/Manage/cat11',
     },
     {
-      name: '管理',
-      path: '/admin',
+      name: 'Dashboard',
+      path: '/dashboard',
       routes: [
         {
-          name: '設定',
-          path: '/admin/setting',
-          component: './Admin/Setting',
+          name: '整体排放',
+          path: '/dashboard/overall',
+          component: './Dashboard/Overall',
+        },
+        {
+          name: '范围1排放',
+          path: '/dashboard/scope1',
+        },
+        {
+          name: '范围2排放',
+          path: '/dashboard/scope2',
+        },
+        {
+          name: '范围3排放',
+          path: '/dashboard/scope3',
+        },
+        {
+          name: '行业对标',
+          path: '/dashboard/industry',
         }
       ]
     },
     {
-      name: 'Dashboard',
-      path: '/access',
-      component: './Access',
-    },
-    {
-      name: ' CO2計算',
+      name: ' 数据計算',
       path: '/co2',
       routes: [
         {
-          name: '数値入力',
+          name: '数据录入',
           path: '/co2/template',
           component: './Co2/Template',
+        },
+        {
+          name: '核算模型',
+          path: '/co2/model',
+        },
+        {
+          name: '排放因子',
+          path: '/co2/factor',
+        }
+      ]
+    },
+    {
+      name: '报告生成',
+      path: '/report',
+    },
+    {
+      name: '碳咨询',
+      path: '/consult',
+    },
+    {
+      name: '绿色交易',
+      path: '/transaction',
+      routes: [
+        {
+          name: '碳积分',
+          path: '/transaction/credit',
+        },
+        {
+          name: '绿色电力',
+          path: '/transaction/power',
+        }
+      ]
+    },
+    {
+      name: '主页管理',
+      path: '/admin',
+      routes: [
+        {
+          name: '企业信息',
+          path: '/admin/setting',
+          component: './Admin/Setting',
+        },
+        {
+          name: '目标设定',
+          path: '/admin/goal',
         }
       ]
     },
