@@ -1,19 +1,22 @@
-import { ProCard } from '@ant-design/pro-components';
+import { ProCard, ProFormSelect } from '@ant-design/pro-components';
 import { DualAxes } from '@ant-design/plots';
 import { useModel } from '@umijs/max';
 import { useRequest } from 'ahooks';
-import { getGhgByMonth } from '@/services/industry-attribute-info-details/IndustryattributeInfoDetailsController';
+import { getGhgByKindType } from '@/services/industry-attribute-info-details/IndustryattributeInfoDetailsController';
+import { useState } from 'react';
 
-const Chart1_4: React.FC = () => {
+const Chart1_6: React.FC = () => {
   const { adminInfo } = useModel("global");
-  const ghgByCatRes = useRequest(
-    async () => await getGhgByMonth({ company_id: adminInfo?.company_id, fiscal_y: '2023' }),
-    { ready: true }
+  const [selectTopN, setSelectTopN] = useState<number>(10);
+
+  const ghgByKindType = useRequest(
+    async () => await getGhgByKindType({ company_id: adminInfo?.company_id, fiscal_y: '2023', top_n: selectTopN }),
+    { ready: true, refreshDeps: [selectTopN] }
   )
 
   const chartConfig = {
-    xField: 'month',
-    data: ghgByCatRes?.data,
+    xField: 'kind_type',
+    data: ghgByKindType?.data,
     legend: {
       color: {
         itemMarker: 'rect'
@@ -49,7 +52,18 @@ const Chart1_4: React.FC = () => {
   return (
     <ProCard direction="column" ghost gutter={[0, 16]}>
       <ProCard gutter={16} ghost>
-        <ProCard style={{ height: 500 }}>
+        <ProCard style={{ height: 700 }} extra={<ProFormSelect
+          width="sm"
+          name="top_n"
+          label="数値入力（TopN）"
+          options={[5, 10, 15, 20].map(i => ({ label: i, value: i }))}
+          fieldProps={{
+            value: selectTopN,
+            style: { width: "100px" },
+            onChange: (value) => setSelectTopN(value),
+          }}
+        />}>
+
           <DualAxes {...chartConfig} />
         </ProCard>
       </ProCard>
@@ -60,4 +74,4 @@ const Chart1_4: React.FC = () => {
   );
 };
 
-export default Chart1_4;
+export default Chart1_6;

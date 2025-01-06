@@ -1,8 +1,14 @@
+import { getGhgByScope3 } from '@/services/industry-attribute-info-details/IndustryattributeInfoDetailsController';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { Divider } from 'antd';
+import { useModel } from '@umijs/max';
+import { useRequest } from 'ahooks';
 
 const Chart1_2: React.FC = () => {
-
+  const { adminInfo } = useModel("global");
+  const ghgByScope3Res = useRequest(
+    async () => await getGhgByScope3({ company_id: adminInfo?.company_id, fiscal_y: '2023' }),
+    { ready: true }
+  )
   const columns: ProColumns<any>[] = [
     {
       width: 100,
@@ -30,34 +36,6 @@ const Chart1_2: React.FC = () => {
     },
   ];
 
-  const dataSource = [
-    {
-      category_cls: "类别1",
-      content: "购买的产品/服务(库存商品)",
-      ghg: 3529.98
-    },
-    {
-      category_cls: "类别3",
-      content: "燃料和能源-范围1和2中未包含的相关活动",
-      ghg: 0.81
-    },
-    {
-      category_cls: "类别4&9",
-      content: "外购物流运输(上游+下游)",
-      ghg: 31.38
-    },
-    {
-      category_cls: "类别6",
-      content: "商务旅行",
-      ghg: 12.15
-    },
-    {
-      category_cls: "类别7",
-      content: "员工通勤",
-      ghg: 5.11
-    },
-  ]
-
   return (
       <ProTable<any>
           bordered
@@ -68,8 +46,7 @@ const Chart1_2: React.FC = () => {
             return Promise.resolve({
             });
           }}
-          dataSource={dataSource}
-          // onChange={setOrgMsts}
+          dataSource={ghgByScope3Res?.data}
           rowKey="key"
           search={false}
         />

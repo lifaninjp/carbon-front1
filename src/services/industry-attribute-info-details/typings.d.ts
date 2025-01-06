@@ -113,4 +113,52 @@ declare namespace IndustryAttributeInfoDetailsAPI {
     importArray: Array<CreateAttributeInfoDetailsInput>;
   }
 
+  interface filterGghByScope {
+    company_id?: string;
+    fiscal_y?: string;
+    top_n?: number;
+  }
+
+  interface GhgByScope {
+    scope_cls?: string;
+    unit?: string;
+    ghg?: number;
+  }
+
+  interface GhgByScope3 {
+    category_cls?: string;
+    content?: string;
+    ghg?: number;
+  }
+
+  interface GhgByCat {
+    scope_cls?: string;
+    category_cls?: string;
+    ghg?: number;
+    ghg_percent?: number;
+  }
+
+  interface GhgByMonth {
+    month?: string;
+    "排放量"?: number;
+    "占比"?: number;
+  }
+
+  interface GhgByOgn {
+    ogn?: string;
+    inst?: string;
+    ghg_percent?: number;
+  }
+
+  interface GhgByKindType {
+    kind_type?: string;
+    "排放量"?: number;
+    "占比"?: number;
+  }
+
+  interface GhgByParty {
+    counterparty_nm?: string;
+    "排放量"?: number;
+    "占比"?: number;
+  }
 }

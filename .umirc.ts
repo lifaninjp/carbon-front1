@@ -28,7 +28,7 @@ export default defineConfig({
   access: {},
   model: {},
   initialState: {},
-  define: { 'process.env.API_URL': 'http://35.72.154.8:4000' },
+  define: { 'process.env.API_URL': 'http://35.72.154.8:3000' },
   request: {},
   layout: {},
   routes: [

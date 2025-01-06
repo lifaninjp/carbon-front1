@@ -1,7 +1,15 @@
+import { getGhgByScope } from '@/services/industry-attribute-info-details/IndustryattributeInfoDetailsController';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
+import { useModel } from '@umijs/max';
+import { useRequest } from 'ahooks';
 import { Divider } from 'antd';
 
 const Chart1: React.FC = () => {
+  const { adminInfo } = useModel("global");
+  const ghgByScopeRes = useRequest(
+    async () => await getGhgByScope({ company_id: adminInfo?.company_id, fiscal_y: '2023' }),
+    { ready: true }
+  )
 
   const columns: ProColumns<any>[] = [
     {
@@ -30,39 +38,20 @@ const Chart1: React.FC = () => {
     },
   ];
 
-  const dataSource = [
-    {
-      scope_cls: "范围一",
-      unit: "吨",
-      ghg: 0
-    },
-    {
-      scope_cls: "范围二",
-      unit: "吨",
-      ghg: 5.94
-    },
-    {
-      scope_cls: "范围三",
-      unit: "吨",
-      ghg: 3579.42
-    }
-  ]
-
   return (
-      <ProTable<any>
-          bordered
-          options={false}
-          
-          columns={columns}
-          request={async (params, sorter, filter) => {
-            return Promise.resolve({
-            });
-          }}
-          dataSource={dataSource}
-          // onChange={setOrgMsts}
-          rowKey="key"
-          search={false}
-        />
+    <ProTable<any>
+      bordered
+      options={false}
+
+      columns={columns}
+      request={async (params, sorter, filter) => {
+        return Promise.resolve({
+        });
+      }}
+      dataSource={ghgByScopeRes?.data}
+      rowKey="key"
+      search={false}
+    />
   );
 };
 
